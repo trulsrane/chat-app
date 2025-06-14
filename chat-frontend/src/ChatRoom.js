@@ -1,8 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const ChatRoom = ({ usermessages }) => {
+const ChatRoom = ({ title, usermessages }) => {
     const messagesEndRef = useRef(null);
+    const maxMessages = 100; // Limit to the last 100 messages
+    usermessages = usermessages.slice(-maxMessages); // Limit to the last 100 messages
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -13,18 +15,22 @@ const ChatRoom = ({ usermessages }) => {
     }, [usermessages]);
 
     return (
-        <div className="h-screen p-4 overflow-y-scroll bg-white rounded-lg shadow-lg">
-            {usermessages.map((msg, index) => (
-                <div key={index} className={`mb-2 p-2 rounded ${msg.isSystem ? 'bg-gray-200' : 'bg-blue-200'}`}>
-                    <strong>{msg.user}: </strong>{msg.message}
-                </div>
-            ))}
-            <div ref={messagesEndRef} />
+        <div className="chat-room">
+            <h3 className="chat-title">{title}</h3>
+            <div className="chat-messages">
+                {usermessages.map((msg, index) => (
+                    <div key={index} className={`chat-message ${msg.isSystem ? 'system-message' : 'user-message'}`}>
+                        <strong>{msg.user}: </strong>{msg.message}
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
         </div>
     );
 };
 
 ChatRoom.propTypes = {
+    title: PropTypes.string.isRequired,
     usermessages: PropTypes.arrayOf(
         PropTypes.shape({
             user: PropTypes.string.isRequired,
